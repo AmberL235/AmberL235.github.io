@@ -99,9 +99,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Internship Experience */}
+        {/* Internship Experience 🔌 */}
         <div id="internships">
-          <h3 className="text-2xl font-semibold mb-4">Internships</h3>
+          <h3 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+            🔌 Internships
+          </h3>
           <p className="text-gray-700 mb-6">
             I’ve gained hands-on experience across different industries, applying engineering principles to 
             solve practical challenges and build reliable systems.
