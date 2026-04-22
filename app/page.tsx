@@ -13,6 +13,7 @@ type ExpandableItem = {
   images?: string[];
   pdfLink?: string;
   tags?: string[];
+  date?: string;
 };
 
 function ExpandableCard({ item }: { item: ExpandableItem }) {
@@ -46,7 +47,13 @@ function ExpandableCard({ item }: { item: ExpandableItem }) {
         {/* Expand/Collapse Button */}
         <button
           onClick={() => setOpen(!open)}
-          className="shrink-0 rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100"
+          className={`
+            shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200
+            ${open 
+              ? 'bg-stone-100 text-stone-700 border border-stone-300' 
+              : 'bg-stone-900 text-white shadow-sm hover:bg-stone-800 hover:shadow-md active:scale-95'
+            }
+          `}
           aria-expanded={open}
         >
           {open ? 'Hide details' : 'View details'}
@@ -57,6 +64,17 @@ function ExpandableCard({ item }: { item: ExpandableItem }) {
       {open && (
         <div className="mt-5 border-t border-stone-200 pt-5">
           <p className="mb-4 leading-7 text-stone-600">{item.details}</p>
+
+          {item.pdfLink && (
+            <a
+              href={item.pdfLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block text-sm font-semibold text-rose-600 hover:underline"
+            >
+              View Full Technical Report (PDF) →
+            </a>
+          )}
 
           {item.images && item.images.length > 0 && (
           <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -75,17 +93,6 @@ function ExpandableCard({ item }: { item: ExpandableItem }) {
             ))}
           </div>
         )}
-
-          {item.pdfLink && (
-            <a
-              href={item.pdfLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-block text-sm font-semibold text-rose-600 hover:underline"
-            >
-              View Full Technical Report (PDF) →
-            </a>
-          )}
         </div>
       )}
     </div>
@@ -99,6 +106,45 @@ export default function Home() {
       document.documentElement.style.scrollBehavior = 'auto';
     };
   }, []);
+
+  function parseDate(dateStr?: string): number {
+    if (!dateStr) return 0;
+    if (dateStr.includes('Summer')) {
+      return parseInt(dateStr.split(' ')[1]) + 0.5;
+    }
+    if (dateStr.includes('Fall')) {
+      return parseInt(dateStr.split(' ')[1]) + 0.8;
+    }
+    if (dateStr.includes('Spring')) {
+      return parseInt(dateStr.split(' ')[1]) + 0.2;
+    }
+    if (dateStr.includes('-')) {
+      const [start, end] = dateStr.split('-').map(Number);
+      return (start + end) / 2;
+    }
+    return parseInt(dateStr) || 0;
+  }
+
+  <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md">
+    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <a href="#" className="text-lg font-bold tracking-tighter text-stone-900 transition hover:text-rose-600">
+        AL
+      </a>
+
+      <div className="flex items-center gap-6 text-sm font-semibold text-stone-500">
+        <a href="#internships" className="transition hover:text-stone-900">Internships</a>
+        <a href="#projects" className="transition hover:text-stone-900">Projects</a>
+        <a href="#research" className="transition hover:text-stone-900">Research</a>
+        
+        <a 
+          href="/contact" 
+          className="rounded-full bg-stone-900 px-5 py-2.5 text-white transition hover:bg-stone-800 shadow-sm"
+        >
+          Contact Me
+        </a>
+      </div>
+    </div>
+  </nav>
 
   const internships: ExpandableItem[] = [
     {
@@ -115,6 +161,7 @@ export default function Home() {
         Validated message conversion for a Bosch air pressure sensor by decoding data from the SENT message bitstream, then encoding it into CAN messages 
         to verify transmission onto a CAN bus.`,
       images: ['/images/PCB3.jpg'],
+      date: 'May 2025 - Aug 2025',
     },
     {
       id: 'tokyo-electron',
@@ -128,22 +175,11 @@ export default function Home() {
         Performed Optical Emission Spectroscopy (OES) analysis to monitor the etch tool chamber's composition and determine optimal etching elements. 
         Compiled findings using data analysis tools such as Origin Lab to support process engineers and enable quicker experiment turnaround times.`,
       images: [],
+      date: 'May 2023 - Aug 2023',
     },
   ];
 
   const nexusProjects: ExpandableItem[] = [
-    {
-      id: 'gps-rtk',
-      title: 'GPS-RTK',
-      tags: ['Embedded Systems', 'Wireless Communication', 'GPS Software'],
-      summary:
-        'Developed an enhanced GPS system that uses real-time kinematics (RTK) to correct the rover’s position for centimeter-level precision.',
-      details:
-        `Worked on improving accuracy for the autonomous beach-cleaning robot by integrating RTK correction data into the GPS localization system.
-        This helped reduce position error drift over time and is essential for navigation on sandy beaches where wheel slipping makes position determination unreliable.
-        Set up wireless communication between the rover and base station GPS modules via Wifi for mid range wireless communication.`,
-      images: ['/images/GPS_RTK_Setup.jpg', '/images/RTK_FIXED.png'],
-    },
     {
       id: 'pcb-design',
       title: 'PCB Design',
@@ -157,22 +193,24 @@ export default function Home() {
         and provides power and controls to the motors and sensors via a Raspberry Pi, a PWM expansion chip, and motor controllers.
         Other on rover boards such as the Power Distribution Board, provide power regulation and distribution for the rover's various subsystems from our 12V battery.`,
       images: ['/images/PCB1.png', '/images/schematic1.png', '/images/Filtration Wiring Diagram.png'],
+      date: 'Spring 2025 - Fall 2025',
+    },
+    {
+      id: 'gps-rtk',
+      title: 'GPS-RTK',
+      tags: ['Embedded Systems', 'Wireless Communication', 'GPS Software'],
+      summary:
+        'Developed an enhanced GPS system that uses real-time kinematics (RTK) to correct the rover’s position for centimeter-level precision.',
+      details:
+        `Worked on improving accuracy for the autonomous beach-cleaning robot by integrating RTK correction data into the GPS localization system.
+        This helped reduce position error drift over time and is essential for navigation on sandy beaches where wheel slipping makes position determination unreliable.
+        Set up wireless communication between the rover and base station GPS modules via Wifi for mid range wireless communication.`,
+      images: ['/images/GPS_RTK_Setup.jpg', '/images/RTK_FIXED.png'],
+      date: 'Spring 2023 - Spring 2024',
     },
   ];
 
   const classProjects: ExpandableItem[] = [
-    {
-      id: 'cmos-image-sensor-array',
-      title: 'CMOS Image Sensor Array',
-      tags: ['Analog IC Design', 'Cadence Virtuoso', 'Switched Capacitor Circuits', 'Pixel Arrays'],
-      summary:
-        'Developed a CMOS image sensor array uisng a mix of digital and analog design techniques.',
-      details:
-        `Designed and simulated a CMOS image sensor array using Cadence Virtuoso. The design consisted of a 32x32 4T pixel array, 
-        row/column addressing and level shifting, correlated double sampling (CDS) for noise reduction, and an 8-bit SAR ADC.
-        The sensors were optimized for low noise and high dynamic range, making them suitable for use in challenging lighting conditions.`,
-      images: [],
-    },
     {
       id: '4-bit-alu',
       title: '4-Bit ALU',
@@ -184,6 +222,20 @@ export default function Home() {
         The logical operations were optimized using dynamic logic.
         The design was simulated in Cadence Virtuoso, with individual subcircuits verified for proper functionality.`,
       images: [],
+      date: 'Spring 2025',
+    },
+    {
+      id: 'cmos-image-sensor-array',
+      title: 'CMOS Image Sensor Array',
+      tags: ['Analog IC Design', 'Cadence Virtuoso', 'Switched Capacitor Circuits', 'Pixel Arrays'],
+      summary:
+        'Developed a CMOS image sensor array uisng a mix of digital and analog design techniques.',
+      details:
+        `Designed and simulated a CMOS image sensor array using Cadence Virtuoso. The design consisted of a 32x32 4T pixel array, 
+        row/column addressing and level shifting, correlated double sampling (CDS) for noise reduction, and an 8-bit SAR ADC.
+        The sensors were optimized for low noise and high dynamic range, making them suitable for use in challenging lighting conditions.`,
+      images: [],
+      date: 'Fall 2025',
     },
     {
       id: 'des-encryption-accelerator',
@@ -196,6 +248,7 @@ export default function Home() {
         focusing on hardware acceleration for improved performance. The design was implemented and verified using a 
         combination of commercial and open source tools ensuring optimal area utilization and power efficiency.`,
       images: [],
+      date: 'Spring 2026',
     },
   ];
 
@@ -212,6 +265,7 @@ export default function Home() {
         The sensors were calibrated using a multilayer perceptron model to improve the mapping between analog sensor readings and ground-truth force-torque data
         for accurate force sensing during human–robot interaction. RVIZ was used to visualize the force vectors on the arm in real time.`,
       images: ['images/Resistive Taxel Diagram.png', '/images/Arm-Cleaned.png', '/images/RVIZ.jpg', '/images/calibration.jpg'],
+      date: 'Mar 2024 - Sep 2024',
     },
     {
       id: 'feeding-nipple',
@@ -227,15 +281,60 @@ export default function Home() {
         The device will be used to characterize behavioral differences such as weaker suckling force and temperature variations that may help distinguish 
         healthy calves from those likely to fall ill.`,
       images: ['/images/Instrumented_Feeding_Nipple.jpg','/images/PCB2.png', '/images/schematic2.png'],
-      pdfLink: '/pdfs/ELI SP 2025 Poster.pdf'
+      pdfLink: '/pdfs/ELI SP 2025 Poster.pdf',
+      date: 'Oct 2024 - May 2025',
     },
   ];
 
+  const sortedInternships = [...internships].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  const sortedNexusProjects = [...nexusProjects].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  const sortedClassProjects = [...classProjects].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  const sortedResearchProjects = [...researchProjects].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+
   return (
     <main className="min-h-screen bg-stone-50 text-stone-800">
+      {/* Floating Navigation Bar */}
+      <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          {/* Home Button / Name */}
+          <a 
+            href="#" 
+            className="text-lg font-bold tracking-tighter text-stone-900 transition hover:text-rose-600"
+          >
+            AL
+          </a>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-6 text-sm font-semibold text-stone-500">
+            <a href="#internships" className="transition hover:text-stone-900">Internships</a>
+            <a href="#projects" className="transition hover:text-stone-900">Projects</a>
+            <a href="#research" className="transition hover:text-stone-900">Research</a>
+            <a 
+              href="/contact" 
+              className="rounded-full bg-stone-900 px-5 py-2.5 text-white transition hover:bg-stone-800 shadow-sm"
+            >
+              Contact Me
+            </a>
+          </div>
+        </div>
+      </nav>
+
       {/* Top Intro */}
       <section className="border-b border-stone-200 bg-gradient-to-b from-rose-50 via-stone-50 to-stone-50">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-24 md:grid-cols-[1.3fr_0.9fr] md:items-center">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-24 md:grid-cols-[0.9fr_1.3fr] md:items-center">
+          <div className="flex justify-center md:justify-start"> {/* Left-align on desktop */}
+            <div className="relative h-72 w-72 overflow-hidden rounded-3xl border border-stone-200 shadow-sm">
+              <Image
+                src="/images/headshot2.png"
+                alt="Amber Li"
+                fill
+                className="object-cover"
+                priority // Use priority for the main intro image
+              />
+            </div>
+          </div>
+
+          {/* About Me */}
           <div>
             <h1 className="text-6xl font-extrabold tracking-tighter text-stone-900 md:text-6xl">
               Amber Li
@@ -263,12 +362,6 @@ export default function Home() {
                 LinkedIn
               </a>
               <a
-                href="mailto:li.amber235@gmail.com"
-                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100"
-              >
-                Get in Touch
-              </a>
-              <a
                 href="/pdfs/Amber Li Resume 2026.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -276,41 +369,35 @@ export default function Home() {
               >
                 Resume
               </a>
-              </div>
-          </div>
-
-          {/* Headshot */}
-          <div className="flex justify-center md:justify-end">
-            <div className="relative h-72 w-72 overflow-hidden rounded-3xl border border-stone-200 shadow-sm">
-              <Image
-                src="/images/headshot2.png"
-                alt="Amber Li"
-                fill
-                className="object-cover"
-                priority // Use priority for the main intro image
-              />
             </div>
           </div>
         </div>
       </section>
 
       {/* Experience */}
-      <section id="internships" className="bg-blue-50/40">
+      <section id="internships" className="scroll-mt-20 bg-blue-50/40">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-semibold text-stone-900">Internships</h2>
           <p className="mb-10 max-w-3xl text-stone-600">
             Industry experience across energy and semiconductor engineering.
           </p>
 
-          <div className="space-y-6">
-            {internships.map((item) => (
-              <ExpandableCard key={item.id} item={item} />
+          <div className="relative">
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            {sortedInternships.map((item, index) => (
+              <div key={item.id} className="relative flex items-center mb-8">
+                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="flex-1">
+                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                  <ExpandableCard item={item} />
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="projects" className="bg-stone-100/70">
+      <section id="projects" className="scroll-mt-20 bg-stone-100/70">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-semibold text-stone-900">Projects</h2>
 
@@ -322,9 +409,16 @@ export default function Home() {
             </p>
           </div>
     
-          <div className="space-y-6">
-            {nexusProjects.map((item) => (
-              <ExpandableCard key={item.id} item={item} />
+          <div className="relative">
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            {sortedNexusProjects.map((item, index) => (
+              <div key={item.id} className="relative flex items-center mb-8">
+                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="flex-1">
+                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                  <ExpandableCard item={item} />
+                </div>
+              </div>
             ))}
           </div>
 
@@ -336,15 +430,22 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="space-y-6">
-            {classProjects.map((item) => (
-              <ExpandableCard key={item.id} item={item} />
+          <div className="relative">
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            {sortedClassProjects.map((item, index) => (
+              <div key={item.id} className="relative flex items-center mb-8">
+                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="flex-1">
+                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                  <ExpandableCard item={item} />
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="research" className="bg-emerald-50/50">
+      <section id="research" className="scroll-mt-20 bg-emerald-50/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-semibold text-stone-900">Research</h2>
           <p className="mb-10 max-w-3xl text-stone-600">
@@ -352,25 +453,25 @@ export default function Home() {
             sensing, and human-centered applications.
           </p>
 
-          <div className="space-y-6">
-            {researchProjects.map((item) => (
-              <ExpandableCard key={item.id} item={item} />
+          <div className="relative">
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            {sortedResearchProjects.map((item, index) => (
+              <div key={item.id} className="relative flex items-center mb-8">
+                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="flex-1">
+                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                  <ExpandableCard item={item} />
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-stone-200 bg-white py-8 text-center text-stone-500">
-        <p>© <CurrentYear /> Amber Li </p>
-        <span className="hidden h-1 w-1 rounded-full bg-stone-300 md:block"></span>
-
-        {/* Email Link */}
-        <a 
-          href="mailto:li.amber235@gmail.com" 
-          className="transition-colors hover:text-rose-600"
-        >
-          li.amber235@gmail.com
-        </a>
+      <footer className="border-t border-stone-200 bg-white py-10">
+        <div className="flex flex-col items-center justify-center gap-4 text-sm font-medium text-stone-500 md:flex-row">
+          <p>© <CurrentYear /> Amber Li</p>
+        </div>
       </footer>
     </main>
   );
