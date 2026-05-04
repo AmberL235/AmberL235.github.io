@@ -16,18 +16,18 @@ type ExpandableItem = {
   date?: string;
 };
 
-function ExpandableCard({ item }: { item: ExpandableItem }) {
+function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noDetails?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+    <div className="min-w-0 w-full overflow-hidden rounded-2xl border border-stone-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-stone-700 dark:bg-stone-900">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h4 className="text-xl font-semibold text-stone-800">{item.title}</h4>
+        <div className="min-w-0 flex-1">
+          <h4 className="text-xl font-semibold text-stone-800 truncate md:whitespace-normal dark:text-stone-100">{item.title}</h4>
           {item.subtitle && (
-            <p className="mt-1 text-sm font-medium text-stone-500">{item.subtitle}</p>
+            <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">{item.subtitle}</p>
           )}
-          <p className="mt-3 text-stone-600">{item.summary}</p>
+          <p className="mt-3 text-stone-600 dark:text-stone-300">{item.summary}</p>
 
           {/* Skills Preview */}
           {item.tags && (
@@ -35,7 +35,7 @@ function ExpandableCard({ item }: { item: ExpandableItem }) {
               {item.tags.map((tag) => (
                 <span 
                   key={tag} 
-                  className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 border border-stone-200"
+                  className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 border border-stone-200 dark:bg-stone-800 dark:text-stone-200 dark:border-stone-700"
                 >
                   {tag}
                 </span>
@@ -45,54 +45,72 @@ function ExpandableCard({ item }: { item: ExpandableItem }) {
         </div>
 
         {/* Expand/Collapse Button */}
-        <button
-          onClick={() => setOpen(!open)}
-          className={`
-            shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200
-            ${open 
-              ? 'bg-stone-100 text-stone-700 border border-stone-300' 
-              : 'bg-stone-900 text-white shadow-sm hover:bg-stone-800 hover:shadow-md active:scale-95'
-            }
-          `}
-          aria-expanded={open}
-        >
-          {open ? 'Hide details' : 'View details'}
-        </button>
+        {!noDetails && (
+          <button
+            onClick={() => setOpen(!open)}
+            className={`
+              shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200
+              ${open 
+                ? 'bg-stone-100 text-stone-700 border border-stone-300 dark:bg-white dark:text-black dark:border-stone-300' 
+                : 'bg-stone-900 text-white shadow-sm hover:bg-stone-800 hover:shadow-md active:scale-95 dark:bg-white dark:text-black dark:border-stone-300 dark:hover:bg-stone-100'
+              }
+            `}
+            aria-expanded={open}
+          >
+            {open ? 'Hide details' : 'View details'}
+          </button>
+        )}
       </div>
 
       {/* Expanded Details */}
-      {open && (
-        <div className="mt-5 border-t border-stone-200 pt-5">
-          <p className="mb-4 leading-7 text-stone-600">{item.details}</p>
+      {!noDetails && open && (
+        <div className="mt-5 border-t border-stone-200 pt-5 dark:border-stone-700">
+          <p className="mb-4 leading-7 text-stone-600 dark:text-stone-300 dark:text-stone-100">{item.details}</p>
 
           {item.pdfLink && (
             <a
               href={item.pdfLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 inline-block text-sm font-semibold text-rose-600 hover:underline"
+              className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
             >
               View Full Technical Report (PDF) →
             </a>
           )}
 
+          {/* Project Gallery Slider */}
           {item.images && item.images.length > 0 && (
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            
-            {item.images.map((img, index) => (
-              <div key={index} className="rounded-xl border border-stone-200 overflow-hidden bg-white">
-                <Image
-                  src={img}
-                  alt={`${item.title} - image ${index + 1}`}
-                  width={1200}
-                  height={0} // Setting height to 0 with 'h-auto' lets the natural ratio take over
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="w-full h-auto block" 
-                />
+            <div className="mt-6 w-full overflow-hidden">
+              <p className="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-300 mb-3">
+                Project Gallery
+              </p>
+              
+              {/* FIX 3: Ensure the scroll container has w-full and min-w-0 
+              */}
+              <div className="flex w-full min-w-0 gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                {item.images.map((img, index) => (
+                  <div 
+                    key={index} 
+                    className="relative aspect-video w-[320px] md:w-[500px] shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-100 snap-center shadow-sm dark:border-stone-700 dark:bg-stone-800"
+                  >
+                    <Image
+                      src={img}
+                      alt={`${item.title} gallery ${index + 1}`}
+                      fill
+                      className="object-contain transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 768px) 260px, 400px"
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+
+              {item.images.length > 1 && (
+                <p className="mt-2 text-center text-xs text-stone-400 italic">
+                  ← Swipe to view more →
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -100,6 +118,29 @@ function ExpandableCard({ item }: { item: ExpandableItem }) {
 }
 
 export default function Home() {
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      window.localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      window.localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
     return () => {
@@ -125,26 +166,26 @@ export default function Home() {
     return parseInt(dateStr) || 0;
   }
 
-  <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md">
-    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-      <a href="#" className="text-lg font-bold tracking-tighter text-stone-900 transition hover:text-rose-600">
-        AL
-      </a>
-
-      <div className="flex items-center gap-6 text-sm font-semibold text-stone-500">
-        <a href="#internships" className="transition hover:text-stone-900">Internships</a>
-        <a href="#projects" className="transition hover:text-stone-900">Projects</a>
-        <a href="#research" className="transition hover:text-stone-900">Research</a>
-        
-        <a 
-          href="/contact" 
-          className="rounded-full bg-stone-900 px-5 py-2.5 text-white transition hover:bg-stone-800 shadow-sm"
-        >
-          Contact Me
-        </a>
-      </div>
-    </div>
-  </nav>
+  const education: ExpandableItem[] = [
+    {
+      id: 'cornell-masters',
+      title: 'Cornell University',
+      subtitle: 'Master of Engineering in Electrical and Computer Engineering',
+      summary: 'Focus: Hardware Acceleration via FPGAs',
+      details: 'Pursuing advanced coursework in high-performance computer architecture, asynchronous circuit design, and hardware-software co-design. Continuing research in assistive robotics and sensor integration.',
+      date: 'Jan 2026 - Dec 2026',
+      tags: ['FPGA', 'ASIC Design', 'Power Electronics'],
+    },
+    {
+      id: 'cornell-undergrad',
+      title: 'Cornell University',
+      subtitle: 'B.S. in Electrical and Computer Engineering, Minor in Computer Science',
+      summary: 'Cumulative GPA: 3.78/4.00 | Dean\'s List Fall 2022 - Spring 2026',
+      details: 'Relevant coursework includes Embedded Systems, Digital Logic Design, Analog IC Design, and VLSI. Recipient of Dean\'s List honors for all semesters.',
+      date: 'Aug 2022 - May 2026',
+      tags: ['VLSI', 'Computer Architecture', 'Analog IC', 'Embedded Systems', 'Robotics', 'Semiconductors & Nanofabrication'],
+    },
+  ];
 
   const internships: ExpandableItem[] = [
     {
@@ -292,35 +333,41 @@ export default function Home() {
   const sortedResearchProjects = [...researchProjects].sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-800">
+    <main className="min-h-screen bg-stone-50 text-stone-800 dark:bg-stone-950 dark:text-stone-100">
       {/* Floating Navigation Bar */}
-      <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           {/* Home Button / Name */}
-          <a 
-            href="#" 
-            className="text-lg font-bold tracking-tighter text-stone-900 transition hover:text-rose-600"
-          >
+          <a href="#" className="text-lg font-bold tracking-tighter text-stone-900 transition hover:text-rose-500 dark:text-stone-100 dark:hover:text-blue-600">
             AL
           </a>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center gap-6 text-sm font-semibold text-stone-500">
-            <a href="#internships" className="transition hover:text-stone-900">Internships</a>
-            <a href="#projects" className="transition hover:text-stone-900">Projects</a>
-            <a href="#research" className="transition hover:text-stone-900">Research</a>
+          <div className="flex items-center gap-6 text-sm font-semibold text-stone-500 dark:text-stone-300">
+            <a href="#" className="transition hover:text-stone-900 dark:hover:text-white">About Me</a>
+            <a href="#education" className="transition hover:text-stone-900 dark:hover:text-white">Education</a>
+            <a href="#internships" className="transition hover:text-stone-900 dark:hover:text-white">Internships</a>
+            <a href="#projects" className="transition hover:text-stone-900 dark:hover:text-white">Projects</a>
+            <a href="#research" className="transition hover:text-stone-900 dark:hover:text-white">Research</a>
             <a 
               href="/contact" 
-              className="rounded-full bg-stone-900 px-5 py-2.5 text-white transition hover:bg-stone-800 shadow-sm"
+              className="rounded-full bg-stone-900 px-5 py-2.5 text-white transition hover:bg-stone-800 shadow-sm dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-200"
             >
               Contact Me
             </a>
           </div>
+
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
+          >
+            {mounted ? (darkMode ? '☀️' : '🌙') : null}
+          </button>
         </div>
       </nav>
 
       {/* Top Intro */}
-      <section className="border-b border-stone-200 bg-gradient-to-b from-rose-50 via-stone-50 to-stone-50">
+      <section className="border-b border-stone-200 bg-gradient-to-b from-blue-50 via-stone-50 to-stone-50 dark:border-stone-800 dark:from-stone-900 dark:via-stone-950 dark:to-stone-950">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-24 md:grid-cols-[0.9fr_1.3fr] md:items-center">
           <div className="flex justify-center md:justify-start"> {/* Left-align on desktop */}
             <div className="relative h-72 w-72 overflow-hidden rounded-3xl border border-stone-200 shadow-sm">
@@ -336,13 +383,13 @@ export default function Home() {
 
           {/* About Me */}
           <div>
-            <h1 className="text-6xl font-extrabold tracking-tighter text-stone-900 md:text-6xl">
+            <h1 className="text-6xl font-extrabold tracking-tighter text-stone-900 md:text-6xl dark:text-stone-100">
               Amber Li
             </h1>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-rose-600 md:text-3xl">
-              Electrical & Computer Engineering Student
+            <p className="mt-4 text-2xl font-bold tracking-tight text-rose-500 dark:text-blue-600 md:text-3xl">
+              Electrical & Computer Engineer
             </p>
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-stone-600">
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-stone-600 dark:text-stone-300">
               I’m a senior at Cornell studying Electrical and Computer Engineering with a
               minor in Computer Science. I’m passionate about sustainable technology,
               robotics, embedded systems, and applying engineering for social impact.
@@ -351,13 +398,13 @@ export default function Home() {
             <div className="mt-12 flex flex-wrap gap-4">
               <a
                 href="https://github.com/AmberL235"
-                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100"
+                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800"
               >
                 GitHub
               </a>
               <a
                 href="https://www.linkedin.com/in/amberli235"
-                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100"
+                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800"
               >
                 LinkedIn
               </a>
@@ -365,7 +412,7 @@ export default function Home() {
                 href="/pdfs/Amber Li Resume 2026.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100"
+                className="rounded-full border border-stone-300 bg-white px-7 py-3.5 text-base font-semibold text-stone-800 transition hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800"
               >
                 Resume
               </a>
@@ -374,21 +421,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Experience */}
-      <section id="internships" className="scroll-mt-20 bg-blue-50/40">
+      {/* Education Section */}
+      <section id="education" className="scroll-mt-20 border-b border-stone-100 bg-white dark:border-stone-800 dark:bg-stone-950">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="mb-4 text-3xl font-semibold text-stone-900">Internships</h2>
-          <p className="mb-10 max-w-3xl text-stone-600">
+          <h2 className="mb-8 text-3xl font-semibold text-stone-900 dark:text-stone-100">Education</h2>
+          
+          <div className="relative">
+            {/* The vertical line */}
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-200 dark:bg-stone-700" style={{ height: 'calc(100% - 2rem)' }}></div>
+            
+            {education.map((item) => (
+              <div key={item.id} className="relative flex items-center mb-8">
+                <div className="flex-shrink-0 w-4 h-4 bg-rose-500 dark:bg-blue-600 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-stone-500 dark:text-stone-400 mb-2 tracking-tight">{item.date}</p>
+                  <ExpandableCard item={item} noDetails={true} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Experience */}
+      <section id="internships" className="scroll-mt-20 bg-blue-50/40 bg-blue-50/40 dark:bg-stone-900">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className="mb-4 text-3xl font-semibold text-stone-900 dark:text-stone-100">Internships</h2>
+          <p className="mb-10 max-w-3xl text-stone-600 dark:text-stone-300">
             Industry experience across energy and semiconductor engineering.
           </p>
 
           <div className="relative">
-            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300 dark:bg-stone-700" style={{ height: 'calc(100% - 2rem)' }}></div>
             {sortedInternships.map((item, index) => (
               <div key={item.id} className="relative flex items-center mb-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
-                <div className="flex-1">
-                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                <div className="flex-shrink-0 w-4 h-4 bg-rose-500 dark:bg-blue-600 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-stone-500 dark:text-stone-400 mb-2">{item.date}</p>
                   <ExpandableCard item={item} />
                 </div>
               </div>
@@ -397,46 +467,46 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="projects" className="scroll-mt-20 bg-stone-100/70">
+      <section id="projects" className="scroll-mt-20 bg-stone-100/70 dark:bg-stone-950">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="mb-4 text-3xl font-semibold text-stone-900">Projects</h2>
+          <h2 className="mb-4 text-3xl font-semibold text-stone-900 dark:text-stone-100">Projects</h2>
 
           {/* Sub-Field 1: Cornell Nexus Project Team */}
           <div className="mb-8">
-            <h3 className="text-lg font-bold uppercase tracking-wider text-rose-600 mb-2">Cornell Nexus Project Team</h3>
-            <p className="max-w-3xl text-stone-600">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-rose-500 dark:text-blue-600 mb-2">Cornell Nexus Project Team</h3>
+            <p className="max-w-3xl text-stone-600 dark:text-stone-300">
               Highlights from Cornell Nexus Project Team, where I worked on an autonomous beach-cleaning robot that filters microplastics from the sand.
             </p>
           </div>
     
           <div className="relative">
-            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300 dark:bg-stone-700" style={{ height: 'calc(100% - 2rem)' }}></div>
             {sortedNexusProjects.map((item, index) => (
               <div key={item.id} className="relative flex items-center mb-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
-                <div className="flex-1">
-                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                <div className="flex-shrink-0 w-4 h-4 bg-rose-500 dark:bg-blue-600 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-stone-500 dark:text-stone-400 mb-2">{item.date}</p>
                   <ExpandableCard item={item} />
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Sub-Field 2: Class Projects with proper top spacing */}
+          {/* Sub-Field 2: Class Projects */}
           <div className="mt-20 mb-8">
-            <h3 className="text-lg font-bold uppercase tracking-wider text-rose-600 mb-2">Technical Coursework</h3>
-            <p className="max-w-3xl text-stone-600">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-rose-500 dark:text-blue-600 mb-2">Technical Coursework</h3>
+            <p className="max-w-3xl text-stone-600 dark:text-stone-300">
               Advanced projects from ECE courses covering Analog IC design, VLSI, and hardware acceleration.
             </p>
           </div>
 
           <div className="relative">
-            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300 dark:bg-stone-700" style={{ height: 'calc(100% - 2rem)' }}></div>
             {sortedClassProjects.map((item, index) => (
               <div key={item.id} className="relative flex items-center mb-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
-                <div className="flex-1">
-                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                <div className="flex-shrink-0 w-4 h-4 bg-rose-500 dark:bg-blue-600 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-stone-500 dark:text-stone-400 mb-2">{item.date}</p>
                   <ExpandableCard item={item} />
                 </div>
               </div>
@@ -445,21 +515,21 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="research" className="scroll-mt-20 bg-emerald-50/50">
+      <section id="research" className="scroll-mt-20 bg-emerald-50/50 dark:bg-stone-900">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="mb-4 text-3xl font-semibold text-stone-900">Research</h2>
-          <p className="mb-10 max-w-3xl text-stone-600">
+          <h2 className="mb-4 text-3xl font-semibold text-stone-900 dark:text-stone-100">Research</h2>
+          <p className="mb-10 max-w-3xl text-stone-600 dark:text-stone-300">
             Undergraduate research in assistive robotics, focused on hardware systems,
             sensing, and human-centered applications.
           </p>
 
           <div className="relative">
-            <div className="absolute left-1.5 top-0 w-1 bg-stone-300" style={{ height: 'calc(100% - 2rem)' }}></div>
+            <div className="absolute left-1.5 top-0 w-1 bg-stone-300 dark:bg-stone-700" style={{ height: 'calc(100% - 2rem)' }}></div>
             {sortedResearchProjects.map((item, index) => (
               <div key={item.id} className="relative flex items-center mb-8">
-                <div className="flex-shrink-0 w-4 h-4 bg-stone-900 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
-                <div className="flex-1">
-                  <p className="text-sm text-stone-500 mb-2">{item.date}</p>
+                <div className="flex-shrink-0 w-4 h-4 bg-rose-500 dark:bg-blue-600 mr-4 z-10" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-stone-500 dark:text-stone-400 mb-2">{item.date}</p>
                   <ExpandableCard item={item} />
                 </div>
               </div>
@@ -468,8 +538,8 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-stone-200 bg-white py-10">
-        <div className="flex flex-col items-center justify-center gap-4 text-sm font-medium text-stone-500 md:flex-row">
+      <footer className="border-t border-stone-200 bg-white py-10 dark:border-stone-800 dark:bg-stone-950">
+        <div className="flex flex-col items-center justify-center gap-4 text-sm font-medium text-stone-500 dark:text-stone-400 md:flex-row">
           <p>© <CurrentYear /> Amber Li</p>
         </div>
       </footer>
