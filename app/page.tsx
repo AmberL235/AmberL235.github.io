@@ -14,6 +14,7 @@ type ExpandableItem = {
   details: string;
   images?: string[];
   pdfLink?: string;
+  website?: string;
   tags?: string[];
   logo?: string;
   date?: string;
@@ -131,7 +132,16 @@ function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noD
             </ReactMarkdown>
           </div>
 
-          {item.pdfLink && (
+          {item.website ? (
+            <a
+              href={item.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
+            >
+              View Project Page →
+            </a>
+          ) : item.pdfLink ? (
             <a
               href={item.pdfLink}
               target="_blank"
@@ -140,7 +150,7 @@ function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noD
             >
               View Full Technical Report (PDF) →
             </a>
-          )}
+          ) : null}
 
           {/* Project Gallery Slider */}
           {item.images && item.images.length > 0 && (
@@ -342,7 +352,7 @@ export default function Home() {
         `Designed a 4-bit arithmetic logic unit (ALU) using VLSI techniques and Cadence Virtuoso.`,
       details:
         `Created the digital logic design for a 4-bit ALU, implementing basic arithmetic, multiplication, shifting, and logical operations. The logical operations were optimized using dynamic logic. The design was simulated in Cadence Virtuoso, with individual subcircuits verified for proper functionality.`,
-      images: [],
+      pdfLink: '/pdfs/VLSI FINAL REPORT.pdf',
       date: 'Spring 2025',
     },
     {
@@ -353,7 +363,7 @@ export default function Home() {
         'Developed a CMOS image sensor array uisng a mix of digital and analog design techniques.',
       details:
         `Designed and simulated a CMOS image sensor array using Cadence Virtuoso. The design consisted of a 32x32 4T pixel array, row/column addressing and level shifting, correlated double sampling (CDS) for noise reduction, and an 8-bit SAR ADC. The sensors were optimized for low noise and high dynamic range, making them suitable for use in challenging lighting conditions.`,
-      images: [],
+      pdfLink: '/pdfs/ECE 4530 Final Report.pdf',
       date: 'Fall 2025',
     },
     {
@@ -365,7 +375,19 @@ export default function Home() {
       details:
         `Created a software baseline and the Verilog design for a DES encryption accelerator, 
         focusing on hardware acceleration for improved performance. The design was implemented and verified using a combination of commercial and open source tools ensuring optimal area utilization and power efficiency.`,
-      images: [],
+      pdfLink: '/pdfs/Project 3 Report.pdf',
+      date: 'Spring 2026',
+    },
+    {
+      id: 'terrain-generator',
+      title: 'Terrain Generator',
+      tags: ['Altera FPGA', 'Platform Designer (Qsys)', 'Verilog', 'C Programming', 'Procedural Generation Algorithms'],
+      summary:
+        `Designed a terrain generator with a split workload between the FPGA and HPS with visualization through VGA.`,
+      details:
+        `
+        Implemented a procedural terrain generator using value noise (simplified Perlin noise algorithm), with the FPGA handling the computationally intensive noise generation and the HPS managing display and visualization functionality on the VGA. The system was designed to efficiently utilize the FPGA for real-time terrain generation while leveraging the HPS for control and visualization tasks.`,
+      website: 'https://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2026/ec769_adl94_km776/ec769_adl94_km776/ec769_adl94_km776/index.html',
       date: 'Spring 2026',
     },
   ];
