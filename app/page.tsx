@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import CurrentYear from '@/components/CurrentYear';
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
 
 type ExpandableItem = {
   id: string;
@@ -13,8 +15,20 @@ type ExpandableItem = {
   images?: string[];
   pdfLink?: string;
   tags?: string[];
+  logo?: string;
   date?: string;
 };
+
+// Helper to allow Markdown format inside details sections
+function normalizeDetails(md?: string): string {
+  if (!md) return '';
+  // Remove leading indentation from each line (keeps paragraph separation)
+  const dedented = md.replace(/^[ \t]+/gm, '');
+  const paragraphPlaceholder = '__PARAGRAPH_BREAK__';
+  const preservedParagraphs = dedented.replace(/\n{2,}/g, paragraphPlaceholder);
+  const collapsed = preservedParagraphs.replace(/\n/g, ' ');
+  return collapsed.replace(new RegExp(paragraphPlaceholder, 'g'), '\n\n').trim();
+}
 
 function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noDetails?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -23,10 +37,25 @@ function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noD
     <div className="min-w-0 w-full overflow-hidden rounded-2xl border border-stone-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-stone-700 dark:bg-stone-900">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h4 className="text-xl font-semibold text-stone-800 truncate md:whitespace-normal dark:text-stone-100">{item.title}</h4>
-          {item.subtitle && (
-            <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">{item.subtitle}</p>
-          )}
+          <div className="flex items-center gap-4">
+            {item.logo && (
+              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-2xl bg-stone-100 dark:bg-stone-800">
+                <Image
+                  src={item.logo}
+                  alt={`${item.title} logo`}
+                  fill
+                  className="object-contain"
+                  sizes="48px"
+                />
+              </div>
+            )}
+            <div className="min-w-0">
+              <h4 className="text-xl font-semibold text-stone-800 truncate md:whitespace-normal dark:text-stone-100">{item.title}</h4>
+              {item.subtitle && (
+                <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">{item.subtitle}</p>
+              )}
+            </div>
+          </div>
           <p className="mt-3 text-stone-600 dark:text-stone-300">{item.summary}</p>
 
           {/* Skills Preview */}
@@ -65,7 +94,42 @@ function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noD
       {/* Expanded Details */}
       {!noDetails && open && (
         <div className="mt-5 border-t border-stone-200 pt-5 dark:border-stone-700">
-          <p className="mb-4 leading-7 text-stone-600 dark:text-stone-300 dark:text-stone-100">{item.details}</p>
+          <div className="mb-4">
+            <ReactMarkdown
+              remarkPlugins={[remarkBreaks]}
+              components={{
+                h1: (props: any) => (
+                  <h1 className="text-2xl font-bold mt-4 mb-2 text-stone-900 dark:text-stone-100" {...props} />
+                ),
+                h2: (props: any) => (
+                  <h2 className="text-xl font-bold mt-3 mb-2 text-stone-900 dark:text-stone-100" {...props} />
+                ),
+                h3: (props: any) => (
+                  <h3 className="text-lg font-bold mt-2 mb-2 text-stone-900 dark:text-stone-100" {...props} />
+                ),
+                p: (props: any) => (
+                  <p className="leading-7 mt-4 first:mt-0 text-stone-600 dark:text-stone-300" {...props} />
+                ),
+                strong: (props: any) => (
+                  <strong className="font-semibold text-stone-900 dark:text-stone-100" {...props} />
+                ),
+                em: (props: any) => (
+                  <em className="italic" {...props} />
+                ),
+                ul: (props: any) => (
+                  <ul className="list-disc ml-6 text-stone-600 dark:text-stone-300" {...props} />
+                ),
+                ol: (props: any) => (
+                  <ol className="list-decimal ml-6 text-stone-600 dark:text-stone-300" {...props} />
+                ),
+                li: (props: any) => (
+                  <li className="mb-1" {...props} />
+                ),
+              } as any}
+            >
+              {normalizeDetails(item.details)}
+            </ReactMarkdown>
+          </div>
 
           {item.pdfLink && (
             <a
@@ -85,8 +149,7 @@ function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noD
                 Project Gallery
               </p>
               
-              {/* FIX 3: Ensure the scroll container has w-full and min-w-0 
-              */}
+              {/* FIX 3: Ensure the scroll container has w-full and min-w-0 */}
               <div className="flex w-full min-w-0 gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                 {item.images.map((img, index) => (
                   <div 
@@ -170,51 +233,74 @@ export default function Home() {
     {
       id: 'cornell-masters',
       title: 'Cornell University',
+      logo: '/images/cornell_logo.jfif',
       subtitle: 'Master of Engineering in Electrical and Computer Engineering',
-      summary: 'Focus: Hardware Acceleration via FPGAs',
-      details: 'Pursuing advanced coursework in high-performance computer architecture, asynchronous circuit design, and hardware-software co-design. Continuing research in assistive robotics and sensor integration.',
+      summary: 'Master\'s Project: Hardware Acceleration via FPGAs',
+      details: 'Pursuing advanced coursework in hardware acceleration, complex digital ASIC design, and hardware-software co-design. Continuing exploration of ECE topics of interest including power electronics and microcontrollers.',
       date: 'Jan 2026 - Dec 2026',
-      tags: ['FPGA', 'ASIC Design', 'Power Electronics'],
+      tags: ['FPGA', 'ASIC Design', 'Power Electronics', 'Operating Systems'],
     },
     {
       id: 'cornell-undergrad',
       title: 'Cornell University',
+      logo: '/images/cornell_logo.jfif',
       subtitle: 'B.S. in Electrical and Computer Engineering, Minor in Computer Science',
       summary: 'Cumulative GPA: 3.78/4.00 | Dean\'s List Fall 2022 - Spring 2026',
-      details: 'Relevant coursework includes Embedded Systems, Digital Logic Design, Analog IC Design, and VLSI. Recipient of Dean\'s List honors for all semesters.',
+      details: 'Coursework spanning the entire hardware to software stack from semiconductor nanofabrication to machine learning. Involvement in robotics research as an undergraduate research assistant in EmPRISE Robotics Lab and a lead of the electrical subteam of Cornell Nexus Project Team. Member of Society of Women Engineers and Cornell IEEE.',
       date: 'Aug 2022 - May 2026',
-      tags: ['VLSI', 'Computer Architecture', 'Analog IC', 'Embedded Systems', 'Robotics', 'Semiconductors & Nanofabrication'],
+      tags: ['Computer Architecture', 'VLSI', 'Analog IC', 'Microelectronics', 'Semiconductors & Nanofabrication', 'Quantum Mechanics', 'Embedded Systems', 'Foundations of Robotics', 'Machine Learning'],
     },
   ];
 
   const internships: ExpandableItem[] = [
     {
+      id: 'ge-aerospace',
+      title: 'GE Aerospace',
+      logo: '/images/ge_aerospace_logo.jfif',
+      tags: ['PLC Programming', 'Industrial Drawings and Diagrams', 'Engine Testing Workflow', 'Python GUI Development'],
+      subtitle: 'Engines Engineering Intern',
+      summary:
+        'Supported engine testing workflows, upgraded test cell electrical controls systems, created electrical schematics and PLC drawings and diagrams, developed a Python GUI for better organization of inventory.',
+      details:
+        `**Test Cell Controls Upgrade**
+        Upgraded the electrical controls systems for test cells with outdated PLCs, communication interfaces, and hardware. Remapped old hardware to new PLC rack design by verifying electrical compatibility of new hardware components and updating the wiring diagrams and PLC I/O drawings. Updated the PLC code to integrate the new hardware and ensure proper functionality of the test cell controls system. Created design review slides for proposed changes to obtain funding for the project.
+
+        **Electrical Schematics and Diagrams**
+        Created a diagram to map the single line diagram labels to the physical motor control center compartments. Identified discrepancies between the drawings and the physical hardware, which was due to not having the most recent version of the drawings. Noted discrepancies for vendors to update the drawings to match existing hardware and ensure better accuracy for future reference. 
+
+        **Python GUI Development**
+        Improved an exisitng Connector Inventory Python GUI to encourage engineers to use the tool for better organization of the inventory of parts used for engine testing. The original GUI application took too long to open which discouraged use of the tool, so I researched more efficient packaging solutions and reduced the application start up time from over 30 seconds to under 10 seconds, with subsequent startups taking only a few seconds. Completed implementation of unfinished features, performed user testing to catch unexpected behavior, and added a few quality of life improvements to the user interface. The tool is now being used by engineers to manage connector inventory and reduce downtime during part searching.`,
+      date: 'May 2026 - Aug 2026',
+    },
+    {
       id: 'plug-power',
       title: 'Plug Power',
-      tags: ['Altium Designer', 'Analog Circuit Design', 'PCB Prototyping', 'Harness Design', 'Automotive Protocols', 'Microcontrollers'],
+      logo: '/images/plug_power_logo.png',
+      tags: ['Altium Designer', 'Analog Circuit Design', 'PCB Prototyping', 'Harness Design', 'Automotive Protocols', 'Microcontrollers', 'Soldering', 'Electrical Test Equipment'],
       subtitle: 'Electrical Engineering Intern',
       summary:
         'Designed PCB test hardware and prototyped communication between CAN, LIN, and SENT protocols.',
       details:
-        `Built a PCB test board in Altium for verifying hydrogen fuel cell stack functions. 
-        The circuit consisted of differential amplifiers, voltage comparators, and a linear regulator for voltage step down. 
-        Also prototyped a communication gateway using a microcontroller to convert between CAN, LIN, and SENT protocols, so that various sensors can be used regardless of their communication interface.
-        Validated message conversion for a Bosch air pressure sensor by decoding data from the SENT message bitstream, then encoding it into CAN messages 
-        to verify transmission onto a CAN bus.`,
+        `**PCB Design**
+
+        Designed a PCB test board in Altium for verifying hydrogen fuel cell stack functions. Created a BOM, ordered parts, and assembled the board in-house. The circuit consisted of differential amplifiers, voltage comparators, and a linear regulator for voltage step down. Tested the board by connecting to a variable power supply and measuring the intermediate and output voltage nodes with a multimeter for various inputs. Debugged and iterated on the design to ensure proper board functionality and signal integrity.
+
+        **Communication Gateway**
+
+        Prototyped a communication gateway using a microcontroller to convert between CAN, LIN, and SENT protocols, so that various sensors can be integrated into the system regardless of their communication interface. Implemented conversion code for reception and transmission of data across the different protocols. Validated message conversion for an air pressure sensor by decoding data from the SENT message bitstream, then encoding it into CAN messages to verify transmission onto a CAN bus.`,
       images: ['/images/PCB3.jpg'],
       date: 'May 2025 - Aug 2025',
     },
     {
       id: 'tokyo-electron',
       title: 'Tokyo Electron',
-      tags: ['SEM Imaging', 'Origin Lab', 'OES Analysis', 'Fab Experience', 'Process Engineering'],
+      logo: '/images/tel_logo.png',
+      tags: ['SEM Imaging', 'Origin Lab', 'OES Analysis', 'Fab Experience', 'Etch Tools'],
       subtitle: 'Process Engineering Intern',
       summary:
         'Performed SEM imaging and etch analysis on wafer samples in semiconductor fabrication workflows.',
       details:
-        `Prepared wafers in the fab to run etch processes, cleaved samples for SEM image data collection, and analyzed etch profiles and critical dimensions. 
-        Performed Optical Emission Spectroscopy (OES) analysis to monitor the etch tool chamber's composition and determine optimal etching elements. 
-        Compiled findings using data analysis tools such as Origin Lab to support process engineers and enable quicker experiment turnaround times.`,
+        `Prepared die samples and wafers in the fab to run etch processes, cleaved SEM samples for imaging and data collection, and analyzed etch profiles and critical dimensions. Became a trained user for all three SEM imaging tools and one of the plasma etching tools. Performed Optical Emission Spectroscopy (OES) analysis to monitor the etch tool chamber's composition and determine optimal etching elements. Compiled findings using data analysis tools such as Origin Lab to support process engineers and enable quicker experiment turnaround times.`,
       images: [],
       date: 'May 2023 - Aug 2023',
     },
@@ -224,6 +310,7 @@ export default function Home() {
     {
       id: 'pcb-design',
       title: 'PCB Design',
+      logo: '/images/nexus_logo.jfif',
       tags: ['Altium Designer', 'PCB Prototyping', 'Power Systems', 'Harness Design', 'Soldering'],
       summary:
         `Used Altium to design custom boards to power and control the electronics for our robot's mobility and filtration systems.`,
@@ -239,6 +326,7 @@ export default function Home() {
     {
       id: 'gps-rtk',
       title: 'GPS-RTK',
+      logo: '/images/nexus_logo.jfif',
       tags: ['Embedded Systems', 'Wireless Communication', 'GPS Software'],
       summary:
         'Developed an enhanced GPS system that uses real-time kinematics (RTK) to correct the rover’s position for centimeter-level precision.',
@@ -297,6 +385,7 @@ export default function Home() {
     {
       id: 'whole-arm-skin',
       title: 'Whole-Arm Skin',
+      logo: '/images/emprise_logo.jfif',
       tags: ['Sensors', 'Robotics', 'Machine Learning', 'Data Collection and Calibration', 'ROS', 'ROS Visualization'],
       summary:
         'Fabricated a force-sensing skin with 28 taxels for robotic arm contact sensing.',
@@ -311,6 +400,7 @@ export default function Home() {
     {
       id: 'feeding-nipple',
       title: 'Instrumented Feeding Nipple',
+      logo: '/images/emprise_logo.jfif',
       tags: ['Engineering Design Prototyping', '3D Printing', 'PCB Design', 'Embedded Systems', 'Sensors'],
       summary:
         'Designed a silicone feeding nipple with embedded force and temperature sensors to study early disease detection in calves.',
@@ -436,7 +526,7 @@ export default function Home() {
                 
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-stone-500 dark:text-stone-400 mb-2 tracking-tight">{item.date}</p>
-                  <ExpandableCard item={item} noDetails={true} />
+                  <ExpandableCard item={item} />
                 </div>
               </div>
             ))}
