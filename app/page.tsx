@@ -315,11 +315,7 @@ export default function Home() {
       summary:
         `Used Altium to design custom boards to power and control the electronics for our robot's mobility and filtration systems.`,
       details:
-        `Designed schematics and layouts using Altium, and assembled prototypes in-house for testing and debugging. 
-        Focused on safe power delivery, connector reliability, and wire organization to support iteration during development.
-        The Filtration PCB was designed for the mechanical subteam to perform off the rover testing of their filtration designs, 
-        and provides power and controls to the motors and sensors via a Raspberry Pi, a PWM expansion chip, and motor controllers.
-        Other on rover boards such as the Power Distribution Board, provide power regulation and distribution for the rover's various subsystems from our 12V battery.`,
+        `Designed schematics and layouts using Altium, and assembled prototypes in-house for testing and debugging. Focused on safe power delivery, connector reliability, and wire organization to support iteration during development. The Filtration PCB was designed for the mechanical subteam to perform off the rover testing of their filtration designs, and provides power and controls to the motors and sensors via a Raspberry Pi, a PWM expansion chip, and motor controllers. Other on rover boards such as the Power Distribution Board, provide power regulation and distribution for the rover's various subsystems from our 12V battery.`,
       images: ['/images/PCB1.png', '/images/schematic1.png', '/images/Filtration Wiring Diagram.png'],
       date: 'Spring 2025 - Fall 2025',
     },
@@ -331,9 +327,7 @@ export default function Home() {
       summary:
         'Developed an enhanced GPS system that uses real-time kinematics (RTK) to correct the rover’s position for centimeter-level precision.',
       details:
-        `Worked on improving accuracy for the autonomous beach-cleaning robot by integrating RTK correction data into the GPS localization system.
-        This helped reduce position error drift over time and is essential for navigation on sandy beaches where wheel slipping makes position determination unreliable.
-        Set up wireless communication between the rover and base station GPS modules via Wifi for mid range wireless communication.`,
+        `Worked on improving accuracy for the autonomous beach-cleaning robot by integrating RTK correction data into the GPS localization system. This helped reduce position error drift over time and is essential for navigation on sandy beaches where wheel slipping makes position determination unreliable. Set up wireless communication between the rover and base station GPS modules via Wifi for mid range wireless communication.`,
       images: ['/images/GPS_RTK_Setup.jpg', '/images/RTK_FIXED.png'],
       date: 'Spring 2023 - Spring 2024',
     },
@@ -347,9 +341,7 @@ export default function Home() {
       summary:
         `Designed a 4-bit arithmetic logic unit (ALU) using VLSI techniques and Cadence Virtuoso.`,
       details:
-        `Created the digital logic design for a 4-bit ALU, implementing basic arithmetic, multiplication, shifting, and logical operations. 
-        The logical operations were optimized using dynamic logic.
-        The design was simulated in Cadence Virtuoso, with individual subcircuits verified for proper functionality.`,
+        `Created the digital logic design for a 4-bit ALU, implementing basic arithmetic, multiplication, shifting, and logical operations. The logical operations were optimized using dynamic logic. The design was simulated in Cadence Virtuoso, with individual subcircuits verified for proper functionality.`,
       images: [],
       date: 'Spring 2025',
     },
@@ -360,9 +352,7 @@ export default function Home() {
       summary:
         'Developed a CMOS image sensor array uisng a mix of digital and analog design techniques.',
       details:
-        `Designed and simulated a CMOS image sensor array using Cadence Virtuoso. The design consisted of a 32x32 4T pixel array, 
-        row/column addressing and level shifting, correlated double sampling (CDS) for noise reduction, and an 8-bit SAR ADC.
-        The sensors were optimized for low noise and high dynamic range, making them suitable for use in challenging lighting conditions.`,
+        `Designed and simulated a CMOS image sensor array using Cadence Virtuoso. The design consisted of a 32x32 4T pixel array, row/column addressing and level shifting, correlated double sampling (CDS) for noise reduction, and an 8-bit SAR ADC. The sensors were optimized for low noise and high dynamic range, making them suitable for use in challenging lighting conditions.`,
       images: [],
       date: 'Fall 2025',
     },
@@ -374,8 +364,7 @@ export default function Home() {
         `Designed a DES encryption accelerator in SystemVerilog and pushed it through a commercial chip flow.`,
       details:
         `Created a software baseline and the Verilog design for a DES encryption accelerator, 
-        focusing on hardware acceleration for improved performance. The design was implemented and verified using a 
-        combination of commercial and open source tools ensuring optimal area utilization and power efficiency.`,
+        focusing on hardware acceleration for improved performance. The design was implemented and verified using a combination of commercial and open source tools ensuring optimal area utilization and power efficiency.`,
       images: [],
       date: 'Spring 2026',
     },
@@ -390,10 +379,7 @@ export default function Home() {
       summary:
         'Fabricated a force-sensing skin with 28 taxels for robotic arm contact sensing.',
       details:
-        `Constructed custom force-sensing resistors (FSRs) with soft bases using piezoresistive sheets and copper conducting fabric 
-        and arranged them into an array that covers a robotic arm. The system was controlled using an Arduino Mega with a 64:1 multiplexer.
-        The sensors were calibrated using a multilayer perceptron model to improve the mapping between analog sensor readings and ground-truth force-torque data
-        for accurate force sensing during human–robot interaction. RVIZ was used to visualize the force vectors on the arm in real time.`,
+        `Constructed custom force-sensing resistors (FSRs) with soft bases using piezoresistive sheets and copper conducting fabric and arranged them into an array that covers a robotic arm. The system was controlled using an Arduino Mega with a 64:1 multiplexer. The sensors were calibrated using a multilayer perceptron model to improve the mapping between analog sensor readings and ground-truth force-torque data for accurate force sensing during human–robot interaction. RVIZ was used to visualize the force vectors on the arm in real time.`,
       images: ['images/Resistive Taxel Diagram.png', '/images/Arm-Cleaned.png', '/images/RVIZ.jpg', '/images/calibration.jpg'],
       date: 'Mar 2024 - Sep 2024',
     },
@@ -405,12 +391,8 @@ export default function Home() {
       summary:
         'Designed a silicone feeding nipple with embedded force and temperature sensors to study early disease detection in calves.',
       details:
-        `Created 3D-printed molds for silicone casting and designed a custom PCB for the microcontroller and sensing circuitry.
-        The nipple contains an array of 12 small custom made force-sensing resistors (FSRs) and a thermistor, and was designed to be compatible with 
-        industry standard feeding bottles. The materials were all chosen to be FDA compliant for food safety as well as waterproof for cleaning and durability.
-        The electronics are housed in a 3D printed electrical box that is small enough to be attached onto the side of the feeding bottle.
-        The device will be used to characterize behavioral differences such as weaker suckling force and temperature variations that may help distinguish 
-        healthy calves from those likely to fall ill.`,
+        `Created 3D-printed molds for silicone casting and designed a custom PCB for the microcontroller and sensing circuitry. The nipple contains an array of 12 small custom made force-sensing resistors (FSRs) and a thermistor, and was designed to be compatible with 
+        industry standard feeding bottles. The materials were all chosen to be FDA compliant for food safety as well as waterproof for cleaning and durability. The electronics are housed in a 3D printed electrical box that is small enough to be attached onto the side of the feeding bottle. The device will be used to characterize behavioral differences such as weaker suckling force and temperature variations that may help distinguish healthy calves from those likely to fall ill.`,
       images: ['/images/Instrumented_Feeding_Nipple.jpg','/images/PCB2.png', '/images/schematic2.png'],
       pdfLink: '/pdfs/ELI SP 2025 Poster.pdf',
       date: 'Oct 2024 - May 2025',
