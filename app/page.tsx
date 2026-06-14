@@ -15,6 +15,7 @@ type ExpandableItem = {
   images?: string[];
   pdfLink?: string;
   website?: string;
+  poster?: string;
   tags?: string[];
   logo?: string;
   date?: string;
@@ -132,25 +133,40 @@ function ExpandableCard({ item, noDetails = false }: { item: ExpandableItem, noD
             </ReactMarkdown>
           </div>
 
-          {item.website ? (
-            <a
-              href={item.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
-            >
-              View Project Page →
-            </a>
-          ) : item.pdfLink ? (
-            <a
-              href={item.pdfLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
-            >
-              View Full Technical Report (PDF) →
-            </a>
-          ) : null}
+          <div className="mt-4 flex flex-col gap-2">
+            {item.website && (
+              <a
+                href={item.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
+              >
+                View Project Page →
+              </a>
+            )}
+
+            {item.pdfLink && (
+              <a
+                href={item.pdfLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
+              >
+                View Full Technical Report →
+              </a>
+            )}
+
+            {item.poster && (
+              <a
+                href={item.poster}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-block text-sm font-semibold text-rose-500 dark:text-blue-600 hover:underline"
+              >
+                View Poster →
+              </a>
+            )}
+          </div>
 
           {/* Project Gallery Slider */}
           {item.images && item.images.length > 0 && (
@@ -416,7 +432,8 @@ export default function Home() {
         `Created 3D-printed molds for silicone casting and designed a custom PCB for the microcontroller and sensing circuitry. The nipple contains an array of 12 small custom made force-sensing resistors (FSRs) and a thermistor, and was designed to be compatible with 
         industry standard feeding bottles. The materials were all chosen to be FDA compliant for food safety as well as waterproof for cleaning and durability. The electronics are housed in a 3D printed electrical box that is small enough to be attached onto the side of the feeding bottle. The device will be used to characterize behavioral differences such as weaker suckling force and temperature variations that may help distinguish healthy calves from those likely to fall ill.`,
       images: ['/images/Instrumented_Feeding_Nipple.jpg','/images/PCB2.png', '/images/schematic2.png'],
-      pdfLink: '/pdfs/ELI SP 2025 Poster.pdf',
+      pdfLink: '/pdfs/ELI Undergraduate Research Report SP25.pdf',
+      poster: '/pdfs/ELI SP 2025 Poster.pdf',
       date: 'Oct 2024 - May 2025',
     },
   ];
